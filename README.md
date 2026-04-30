@@ -1,454 +1,309 @@
-# alani-spec
-Alani OS Specification
+# Alani
 
-1. Kernel Protocol Specification
+**A Bare-Metal Intelligence Operating System**
 
-1.1 Design Principles
+> *A Cognitive Kernel for Orchestrating Machine Reasoning at the Systems Level*
 
-The protocol is:
+[![License: Open Specification](https://img.shields.io/badge/license-open%20specification-blue)](./SPECIFICATION.md)
+[![Language: Rust](https://img.shields.io/badge/language-Rust-orange)](https://www.rust-lang.org/)
+[![ArXiv Preprint](https://img.shields.io/badge/arXiv-cs.OS-red)](https://arxiv.org/)
 
-* Model-agnostic (no hard dependency on any model)
-* Stateful (memory is first-class)
-* Event-driven (everything is a signal)
-* Composable (multi-model, multi-agent orchestration)
-* Inspectable (traceable reasoning + execution)
+---
 
-⸻
+## Overview
 
-1.2 Core Abstractions
+Alani is a bare-metal intelligence operating system that treats reasoning, memory, and decision-making as first-class kernel-managed resources. Rather than relegating intelligence to the application layer, Alani introduces a **cognitive kernel** — a microkernel-inspired control plane that governs the full lifecycle of intent, context, inference, and action through a syscall-mediated protocol.
 
-1. Intent
+Implemented in **Rust** for memory safety and deterministic control, Alani separates intelligence orchestration from model execution. Models are not embedded in the kernel — they are abstracted as **cognitive devices**, analogous to how Linux manages GPUs or network interfaces.
 
-Structured representation of a goal.
+This repository contains the **open specification** for the Alani architecture. It is released for research, implementation, and extension.
 
-{
-  "id": "intent_123",
-  "type": "task | query | action",
-  "objective": "Generate Q2 revenue forecast",
-  "constraints": {
-    "latency_ms": 2000,
-    "cost_limit": 0.50
-  },
-  "priority": "high",
-  "origin": "user | system | agent"
-}
+---
 
-⸻
+## Why Alani?
 
-2. Context
+Current operating systems were designed for deterministic execution over static data. Intelligence is bolted on as an afterthought — running as applications, services, or API calls. This creates fundamental problems:
 
-Dynamic bundle of relevant state.
+| Problem | Description |
+|---------|-------------|
+| **Context Fragmentation** | Reasoning state is scattered across processes and systems with no unified management. |
+| **No Persistent Reasoning** | There is no system-level mechanism for maintaining or resuming cognitive state. |
+| **Unscheduled Cognition** | Cognitive workloads lack formal scheduling, isolation, or resource governance. |
+| **Unverifiable Decisions** | No audit trail exists for how machine-driven decisions are formed or executed. |
 
-{
-  "memory_refs": ["mem_45", "mem_78"],
-  "documents": ["doc_12"],
-  "environment": {
-    "time": "2026-04-30T12:00:00Z",
-    "user_role": "finance_lead"
-  },
-  "session_state": {}
-}
+Alani solves these by making intelligence a **kernel-managed primitive** — scheduled, isolated, permissioned, and traceable at the OS level.
 
-⸻
+---
 
-3. Cognitive Task
+## Architecture
 
-Unit of reasoning work assigned to a model.
+Alani follows a vertically integrated system model:
 
-{
-  "task_id": "task_001",
-  "intent_id": "intent_123",
-  "type": "analysis | planning | generation | evaluation",
-  "input": {...},
-  "model_requirements": {
-    "capabilities": ["reasoning", "numerical"],
-    "latency_tier": "medium"
-  }
-}
 
-⸻
 
-4. Action
+┌──────────────────────────────────────┐ │         Interfaces                   │  Shells, APIs, External Systems ├──────────────────────────────────────┤ │         Userspace Runtime            │  Agents, Services, Workflows ├──────────────────────────────────────┤ │         Cognitive Devices            │  Models, Memory Engines ├──────────────────────────────────────┤ │         Alani Kernel                 │  Cognitive Microkernel ├──────────────────────────────────────┤ │         Hardware                     │  CPU, RAM, GPU/TPU/NPU └──────────────────────────────────────┘
 
-Executable operation.
 
-{
-  "action_id": "action_77",
-  "type": "api_call | agent_trigger | workflow",
-  "target": "salesforce.create_report",
-  "parameters": {...},
-  "permissions": ["finance.read"]
-}
+### Core Components
 
-⸻
+- **Cognitive Kernel** — Manages scheduling, IPC, memory, and cognitive syscalls. All intelligence operations pass through the kernel boundary.
+- **Cognitive Devices** — Models (`/dev/model/llm0`) and memory systems (`/dev/memory/vector0`) are abstracted as kernel-managed devices.
+- **Cognitive Syscall Interface** — A formal API for intent creation, context resolution, model inference, memory operations, action execution, and tracing.
+- **Userspace Runtime** — Agents, tools, and workflows execute in userspace, invoking intelligence through syscalls.
 
-5. Memory Write
+---
 
-{
-  "memory_id": "mem_999",
-  "type": "episodic | semantic | procedural",
-  "content": {...},
-  "source": "execution_trace",
-  "confidence": 0.92
-}
+## Cognitive Syscall Interface
 
-⸻
+All intelligence operations are mediated through a typed syscall boundary:
 
-6. Evaluation
+```c
+int sys_intent_create(intent_t* intent);
+int sys_context_resolve(intent_id_t id, context_t* ctx);
+int sys_model_infer(task_t* task, result_t* out);
+int sys_memory_query(query_t* q, result_t* out);
+int sys_memory_write(memory_t* mem);
+int sys_action_execute(action_t* action);
+int sys_trace_emit(trace_t* trace);
 
-{
-  "evaluation_id": "eval_22",
-  "target": "task_001",
-  "metrics": {
-    "accuracy": 0.87,
-    "latency": 1200,
-    "cost": 0.32
-  },
-  "feedback": "acceptable but missing edge cases"
-}
 
-⸻
+Every syscall is:
 
-1.3 Kernel Interfaces
+• Permission-checked at the kernel boundary
+• Auditable via structured trace logs
+• Schedulable as a kernel-managed task
 
-A. Intent Interface
 
-POST /kernel/intent
+---
 
-Input:
+Cognitive Devices
 
-* raw input (text, API, event)
+Models and memory systems are abstracted as devices, following UNIX conventions:
 
-Output:
+Model Devices
 
-* structured Intent object
+/dev/model/llm0        # Large language model
+/dev/model/vision0     # Vision model
 
-⸻
 
-B. Context Resolver
+Responsibilities: inference execution, capability reporting, queue handling.
 
-POST /kernel/context
+Memory Devices
 
-Input:
+/dev/memory/vector0    # Vector/embedding store
+/dev/memory/graph0     # Knowledge graph
 
-* intent_id
 
-Output:
+Responsibilities: semantic retrieval, structured queries, persistence.
 
-* assembled context bundle
+---
 
-⸻
+Design Principles
 
-C. Model Router
+1. Intelligence as a Primitive — Reasoning and context are managed like memory and processes.
+2. Kernel/User Separation — Cognitive control resides in kernel space; execution occurs in userspace.
+3. Model Abstraction — Models are devices, not logic embedded in the kernel.
+4. Deterministic Governance, Probabilistic Execution — Kernel behavior is deterministic; inference remains probabilistic.
+5. Memory Safety and Concurrency — Rust-based implementation ensures safe, concurrent, low-level execution.
 
-POST /kernel/route
 
-Input:
+---
 
-* cognitive_task
+Cognitive Kernel Subsystem
 
-Output:
+The kernel introduces a dedicated cognition subsystem:
 
-* selected model(s)
+cognition/
+├── intent.rs       # Intent lifecycle management
+├── context.rs      # Context resolution and assembly
+├── planner.rs      # Task decomposition and planning
+├── router.rs       # Model selection and routing
+└── policy.rs       # Governance and policy enforcement
 
-{
-  "model": "gpt-x",
-  "fallback": ["claude-y"],
-  "strategy": "parallel | sequential"
-}
 
-⸻
+---
 
-D. Execution Planner
+Memory Architecture
 
-POST /kernel/plan
+Memory is multi-tiered, permission-enforced, and kernel-governed:
 
-Output:
+Tier	Scope	Description	
+Kernel Cognitive Memory	Kernel	Secure, policy-critical data	
+User Cognitive Memory	Per-agent	Agent-accessible reasoning state	
+Shared Semantic Memory	System-wide	Embeddings, documents, shared knowledge	
+Execution Trace Memory	System-wide	Full reasoning and decision logs	
 
-* DAG of tasks + actions
+
+All memory tiers are queryable via syscalls and persisted across sessions.
+
+---
+
+Security Model
+
+Security is enforced at the kernel level, not delegated to applications:
+
+• Capability-based access control — Fine-grained permissions for agents and devices
+• Memory isolation — Cognitive memory regions are isolated per-agent
+• Agent sandboxing — Userspace agents operate within defined capability boundaries
+• Device-level permissions — Model and memory device access is permission-gated
+
+
+Enforcement occurs at every syscall boundary, memory access, and device invocation.
+
+---
+
+Observability
+
+Every cognitive operation produces a structured trace:
 
 {
-  "plan": [
-    {"type": "task", "id": "task_1"},
-    {"type": "action", "id": "action_2"}
-  ]
+  "intent_id": "123",
+  "tasks": ["context_resolve", "model_infer"],
+  "models_used": ["llm0"],
+  "latency_ms": 842,
+  "result": "success"
 }
 
-⸻
 
-E. Execution Engine
+Trace components include intent lifecycle, context assembly, model usage, and execution results.
 
-POST /kernel/execute
+---
 
-Executes:
+Minimal Viable Kernel (MVK)
 
-* tasks (via models)
-* actions (via tools/agents)
+The MVK defines the smallest bootable implementation of the Alani architecture:
 
-⸻
+Scope
 
-F. Evaluation Engine
+• Bootable Rust kernel
+• Basic scheduler
+• Cognitive syscall layer
+• Single model device (userspace)
+• Simple memory device
 
-POST /kernel/evaluate
 
-Produces:
+Execution Path
 
-* performance metrics
-* error detection
-* quality scoring
+input → sys_intent_create → sys_context_resolve → sys_model_infer → sys_memory_write
 
-⸻
 
-G. Memory Interface
+---
 
-POST /memory/write
-GET /memory/query
+Project Structure
 
-Supports:
+alani/
+├── kernel/
+│   ├── src/
+│   │   ├── main.rs              # Kernel entry point
+│   │   ├── scheduler.rs         # Process and cognitive scheduling
+│   │   ├── memory.rs            # Memory management
+│   │   ├── ipc.rs               # Inter-process communication
+│   │   ├── syscall.rs           # Syscall dispatch
+│   │   └── cognition/
+│   │       ├── intent.rs        # Intent lifecycle
+│   │       ├── context.rs       # Context resolution
+│   │       ├── planner.rs       # Task planning
+│   │       ├── router.rs        # Model routing
+│   │       └── policy.rs        # Policy enforcement
+│   └── Cargo.toml
+├── devices/
+│   ├── model/                   # Model device drivers
+│   └── memory/                  # Memory device drivers
+├── userspace/
+│   ├── agents/                  # Agent runtime
+│   ├── tools/                   # Tool integrations
+│   └── shell/                   # Interactive shell
+├── spec/
+│   └── SPECIFICATION.md         # Full technical specification
+├── docs/
+│   ├── architecture.md          # Architecture deep-dive
+│   ├── syscalls.md              # Syscall reference
+│   └── security.md              # Security model documentation
+├── README.md
+├── LICENSE
+└── Cargo.toml
 
-* semantic retrieval
-* structured queries
-* permission filters
 
-⸻
+---
 
-1.4 Kernel Lifecycle
+Differentiation
 
-This is the core runtime loop:
+System	Intelligence Location	Cognitive Governance	
+Linux	None (applications only)	N/A	
+AI Platforms	Application layer	Framework-dependent	
+Alani	Kernel layer	Syscall-mediated, kernel-enforced	
 
-INPUT → INTENT → CONTEXT → PLAN → ROUTE → EXECUTE → EVALUATE → MEMORY → LOOP
 
-More explicitly:
+---
 
-1. Ingest
-    * user/system signal arrives
-2. Intent Resolution
-    * structure objective
-3. Context Assembly
-    * fetch memory + environment
-4. Planning
-    * decompose into tasks/actions
-5. Routing
-    * assign models
-6. Execution
-    * run tasks + actions
-7. Evaluation
-    * validate outputs
-8. Memory Update
-    * persist results + learnings
-9. Continuation
-    * decide next step or terminate
+Roadmap
 
-⸻
+• Bootable MVK with cognitive syscall layer
+• Single model device integration (userspace LLM)
+• Simple memory device (vector store)
+• Agent runtime and shell
+• Distributed cognitive kernels
+• Hardware acceleration for inference (GPU/TPU/NPU)
+• Formal verification of reasoning traces
+• Standardized cognitive syscall ABI
 
-1.5 Event System
 
-Everything emits events:
+---
 
-{
-  "event_type": "task.completed",
-  "timestamp": "...",
-  "payload": {...}
+Specification
+
+The full technical specification is available as:
+
+• White Paper (DOCX) — Complete architectural specification
+• ArXiv Preprint — Formal publication (forthcoming)
+
+
+Citation:
+
+@misc{hanks2026alani,
+  title   = {Alani: A Bare-Metal Intelligence Operating System},
+  author  = {Hanks, Marlon},
+  year    = {2026},
+  note    = {Open Specification, Independent Research},
+  url     = {https://github.com/alani-os/alani}
 }
 
-Key event types:
 
-* intent.created
-* context.resolved
-* task.started / completed
-* action.executed
-* evaluation.completed
-* memory.updated
+---
 
-⸻
+References
 
-2. Reference Architecture
+1. A. S. Tanenbaum, Modern Operating Systems, 4th ed. Pearson, 2014.
+2. J. Liedtke, “On micro-kernel construction,” in Proc. 15th ACM SOSP, 1995, pp. 237–250.
+3. R. Klabnik and S. Nichols, The Rust Programming Language. No Starch Press, 2019.
+4. A. Vaswani et al., “Attention is all you need,” in NeurIPS, 2017.
+5. J. S. Chase et al., “Sharing and protection in a single-address-space operating system,” ACM TOCS, vol. 12, no. 4, 1994.
+6. D. R. Engler, M. F. Kaashoek, and J. O’Toole Jr., “Exokernel: An operating system architecture for application-level resource management,” in Proc. 15th ACM SOSP, 1995, pp. 251–266.
+7. P. Lewis et al., “Retrieval-augmented generation for knowledge-intensive NLP tasks,” in NeurIPS, 2020.
+8. Y. Yao et al., “ReAct: Synergizing reasoning and acting in language models,” in Proc. ICLR, 2023.
 
-2.1 High-Level Components
 
-                ┌──────────────────────┐
-                │     Interfaces       │
-                │ Chat / API / Voice   │
-                └─────────┬────────────┘
-                          │
-                ┌─────────▼────────────┐
-                │    Kernel Protocol   │
-                │ (Control Plane)      │
-                └─────────┬────────────┘
-                          │
-     ┌──────────────┬─────┴─────┬──────────────┐
-     │              │           │              │
-┌────▼────┐   ┌─────▼────┐ ┌────▼────┐   ┌─────▼────┐
-│ Memory  │   │ Model    │ │ Execution│   │ Evaluation│
-│ System  │   │ Router   │ │ Layer    │   │ Engine    │
-└────┬────┘   └─────┬────┘ └────┬────┘   └─────┬────┘
-     │              │           │              │
-     │        ┌─────▼─────┐     │        ┌─────▼─────┐
-     │        │ Models    │     │        │ Feedback  │
-     │        │ (LLMs etc)│     │        │ Loops     │
-     │        └───────────┘     │        └───────────┘
-     │                          │
-     │                   ┌──────▼──────┐
-     │                   │ Tools/Agents│
-     │                   │ APIs/Systems│
-     │                   └─────────────┘
+---
 
-⸻
+Contributing
 
-2.2 Component Breakdown
+Alani is an open specification. Contributions are welcome in the following areas:
 
-Kernel Protocol (Control Plane)
+• Specification refinement — Propose changes to the syscall interface, device model, or memory architecture.
+• Reference implementation — Contribute to the Rust-based MVK.
+• Research — Extend the architecture with formal methods, new device types, or scheduling algorithms.
 
-Submodules:
 
-* Intent Resolver
-* Context Manager
-* Planner
-* Router
-* Orchestrator
-* Policy Engine
+Please open an issue or submit a pull request to participate.
 
-⸻
+---
 
-Memory System
+License
 
-APIs:
+This specification is released as an open document for research, implementation, and extension. See LICENSE for terms.
 
-GET /memory/query?q=forecast history
-POST /memory/write
+---
 
-Backends:
 
-* vector DB
-* graph DB
-* document store
 
-⸻
-
-Model Router
-
-Responsibilities:
-
-* capability matching
-* cost optimization
-* latency balancing
-* fallback handling
-
-⸻
-
-Execution Layer
-
-POST /execute/tool
-POST /execute/agent
-
-Supports:
-
-* synchronous execution
-* async workflows
-* retries + rollback
-
-⸻
-
-Agents
-
-Agent spec:
-
-{
-  "agent_id": "finance_analyst",
-  "capabilities": ["forecasting", "reporting"],
-  "tools": ["excel_api", "erp_api"],
-  "permissions": ["finance.read"]
-}
-
-⸻
-
-Evaluation Engine
-
-* LLM-based critique
-* rule-based validation
-* statistical scoring
-
-⸻
-
-2.3 Example End-to-End Flow
-
-User input:
-
-“Generate a Q2 revenue forecast and send it to leadership.”
-
-System flow:
-
-1. Intent created
-2. Context pulls:
-    * past forecasts
-    * CRM data
-3. Planner creates:
-    * analysis task
-    * report generation
-    * email action
-4. Router selects:
-    * forecasting model
-    * generation model
-5. Execution:
-    * run forecast
-    * generate report
-    * send email
-6. Evaluation:
-    * validate numbers
-7. Memory:
-    * store forecast + outcome
-
-⸻
-
-2.4 API Surface (Developer View)
-
-Submit a task
-
-POST /alani/run
-{
-  "input": "Generate Q2 forecast",
-  "context": {
-    "org": "acme",
-    "user": "finance_lead"
-  }
-}
-
-⸻
-
-Register a tool
-
-POST /tools/register
-
-⸻
-
-Register a model
-
-POST /models/register
-
-⸻
-
-Query execution trace
-
-GET /trace/{run_id}
-
-⸻
-
-2.5 Observability
-
-Every run produces:
-
-* trace graph
-* decision logs
-* model usage
-* latency + cost metrics
-
-⸻
-
-2.6 Deployment Model
-
-* Cloud-native control plane
-* Distributed execution nodes
-* On-prem memory options (enterprise)
-
-⸻
-
+The README covers the full specification surface — architecture stack, syscall interface, device model, memory tiers, security, observability, project structure, roadmap, and BibTeX citation — all formatted for a GitHub repository landing page. You can drop this alongside the white paper in your repo and it’s ready to go.
