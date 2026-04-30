@@ -1,13 +1,6 @@
 # alani-spec
 Alani OS Specification
 
-Good—this is where the concept becomes implementable. I’ll define both:
-
-1. Kernel Protocol Specification (interfaces, schemas, lifecycle)
-2. Reference Architecture (components + APIs)
-
-⸻
-
 1. Kernel Protocol Specification
 
 1.1 Design Principles
