@@ -72,7 +72,6 @@ This bundle expands the attached Alani Executive Summary into implementation-rea
 | 61 | Contribution Guidelines | `docs/61_Contribution_Guidelines.md` |
 | 62 | License Legal | `docs/62_License_Legal.md` |
 | 63 | Repository Expansion Addendum | `docs/63_Repository_Expansion_Addendum.md` |
-| 63 | Repository Expansion Addendum | `docs/63_Repository_Expansion_Addendum.md` |
 
 ## Top-level repositories
 
