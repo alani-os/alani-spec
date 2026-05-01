@@ -1,0 +1,9 @@
+flowchart LR
+    Sources --> Intake
+    Intake --> Provenance
+    Provenance --> Normalize
+    Normalize --> Label
+    Label --> Validate
+    Validate --> Split
+    Split --> Evaluate
+    Evaluate --> Release

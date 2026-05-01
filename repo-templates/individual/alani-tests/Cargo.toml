@@ -1,0 +1,18 @@
+[package]
+name = "alani-tests"
+version = "0.1.0"
+edition = "2021"
+license-file = "LICENSE"
+publish = false
+
+[features]
+default = ["std"]
+std = []
+
+[dependencies]
+
+[package.metadata.alani]
+tier = "MVK required"
+owner = "QA team"
+architectural_dependencies = ["alani-abi", "alani-protocol", "alani-ipc", "alani-filesystem", "alani-sim", "alani-corpus", "alani-policy"]
+aliases = ["alani-conformance"]

@@ -1,0 +1,26 @@
+# Alani corpus label taxonomy v1
+version: alani.labels.v1
+labels:
+  terminal: User-facing terminal command or shell interaction.
+  audit: Audit log query, verification, or policy evidence.
+  syscall: Kernel syscall intent or trace.
+  memory: Persistent/cognitive memory operation.
+  device: Device discovery, open, operation, or error.
+  cognition: Model, inference, retrieval, or planner request.
+  security: Capability, authorization, attestation, or crypto policy.
+  scheduler: Task scheduling, priority, deadline, or cancellation.
+  repository: Developer task mapped to one or more Alani repositories.
+  qa: Test, benchmark, CI, release, or corpus validation case.
+  allow: Expected policy decision is allow.
+  deny: Expected policy decision is deny.
+quality:
+  security_labels_require_two_reviewers: true
+  non_synthetic_sources_require_license_review: true
+  required_fields:
+    - record_id
+    - schema_version
+    - source.kind
+    - source.license
+    - task
+    - labels
+    - annotations.intent

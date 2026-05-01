@@ -1,0 +1,34 @@
+{
+  "schema_version": "alani.corpus.stats.v1",
+  "generated_at": "2026-04-30T21:27:04Z",
+  "record_count": 160,
+  "splits": {
+    "train": 112,
+    "validation": 24,
+    "test": 24
+  },
+  "tasks": [
+    "device_event",
+    "memory_record",
+    "policy_case",
+    "qa_case",
+    "repository_task",
+    "syscall_trace",
+    "terminal_command"
+  ],
+  "labels": [
+    "allow",
+    "audit",
+    "cognition",
+    "deny",
+    "device",
+    "memory",
+    "qa",
+    "query",
+    "repository",
+    "scheduler",
+    "security",
+    "syscall",
+    "terminal"
+  ]
+}

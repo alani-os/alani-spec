@@ -1,0 +1,18 @@
+[package]
+name = "alani-models"
+version = "0.1.0"
+edition = "2021"
+license-file = "LICENSE"
+publish = false
+
+[features]
+default = ["std"]
+std = []
+
+[dependencies]
+
+[package.metadata.alani]
+tier = "Post-MVK boundary"
+owner = "Cognition team"
+architectural_dependencies = ["alani-protocol", "alani-cognition", "alani-corpus", "alani-policy"]
+aliases = []

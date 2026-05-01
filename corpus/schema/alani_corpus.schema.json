@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://alani.example/schema/alani_corpus.v1.json",
+  "title": "Alani Corpus Record",
+  "type": "object",
+  "required": [
+    "record_id",
+    "schema_version",
+    "split",
+    "source",
+    "task",
+    "input",
+    "expected",
+    "labels",
+    "annotations"
+  ],
+  "properties": {
+    "record_id": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "alani.corpus.v1"
+    },
+    "split": {
+      "enum": [
+        "train",
+        "validation",
+        "test"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "kind",
+        "license",
+        "generator"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "synthetic",
+            "open",
+            "internal",
+            "simulation"
+          ]
+        },
+        "license": {
+          "type": "string"
+        },
+        "generator": {
+          "type": "string"
+        },
+        "provenance": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "task": {
+      "type": "string"
+    },
+    "input": {
+      "type": "object"
+    },
+    "expected": {
+      "type": "object"
+    },
+    "labels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "annotations": {
+      "type": "object"
+    },
+    "created_at": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

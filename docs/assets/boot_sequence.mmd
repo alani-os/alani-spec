@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Bootloader
+    participant Kernel
+    participant Memory
+    participant Scheduler
+    participant Runtime
+    participant Audit
+    Bootloader->>Kernel: handoff(memory_map, boot_info)
+    Kernel->>Memory: initialize frames and page tables
+    Kernel->>Audit: start early ring buffer
+    Kernel->>Scheduler: create runtime task
+    Scheduler->>Runtime: enter init userspace
+    Runtime->>Kernel: sys_info / sys_trace_context
+    Kernel->>Audit: record runtime start

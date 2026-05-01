@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+OUT="${1:-release/alani_release.zip}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+mkdir -p "$(dirname "$ROOT_DIR/$OUT")"
+python3 "$ROOT_DIR/tools/check_bundle.py"
+TMP="$(mktemp -d)"
+mkdir -p "$TMP/alani_release"
+cp -R "$ROOT_DIR/docs" "$TMP/alani_release/docs"
+cp -R "$ROOT_DIR/corpus" "$TMP/alani_release/corpus"
+cp -R "$ROOT_DIR/repo-templates" "$TMP/alani_release/repo-templates"
+cp -R "$ROOT_DIR/tools" "$TMP/alani_release/tools"
+cp "$ROOT_DIR/README.md" "$TMP/alani_release/README.md"
+cp "$ROOT_DIR/MANIFEST.md" "$TMP/alani_release/MANIFEST.md"
+cp "$ROOT_DIR/LICENSE-DRAFT" "$TMP/alani_release/LICENSE-DRAFT"
+cp "$ROOT_DIR/THIRD_PARTY_NOTICES.md" "$TMP/alani_release/THIRD_PARTY_NOTICES.md"
+(cd "$TMP/alani_release" && zip -qr "$ROOT_DIR/$OUT" .)
+rm -rf "$TMP"
+echo "wrote $ROOT_DIR/$OUT"

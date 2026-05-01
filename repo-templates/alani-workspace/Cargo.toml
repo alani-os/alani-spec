@@ -1,0 +1,41 @@
+[workspace]
+resolver = "2"
+members = [
+    "../alani-kernel",
+    "../alani-runtime",
+    "../alani-lib",
+    "../alani-cognition",
+    "../alani-memory",
+    "../alani-devices",
+    "../alani-security",
+    "../alani-audit",
+    "../alani-terminal",
+    "../alani-userspace",
+    "../alani-filesystem",
+    "../alani-boot",
+    "../alani-platform",
+    "../alani-abi",
+    "../alani-protocol",
+    "../alani-ipc",
+    "../alani-storage",
+    "../alani-observability",
+    "../alani-init",
+    "../alani-config",
+    "../alani-policy",
+    "../alani-identity",
+    "../alani-network",
+    "../alani-sdk",
+    "../alani-sim",
+    "../alani-tests",
+    "../alani-benchmarks",
+    "../alani-docs",
+    "../alani-corpus",
+    "../alani-models",
+    "../alani-release",
+    "../alani-package",
+]
+
+[workspace.package]
+edition = "2021"
+version = "0.1.0"
+license-file = "LICENSE"

@@ -1,0 +1,18 @@
+[package]
+name = "alani-package"
+version = "0.1.0"
+edition = "2021"
+license-file = "LICENSE"
+publish = false
+
+[features]
+default = ["std"]
+std = []
+
+[dependencies]
+
+[package.metadata.alani]
+tier = "Post-MVK boundary"
+owner = "Runtime and release teams"
+architectural_dependencies = ["alani-abi", "alani-protocol", "alani-config", "alani-policy", "alani-filesystem", "alani-identity"]
+aliases = []

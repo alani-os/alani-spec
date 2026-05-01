@@ -1,0 +1,18 @@
+[package]
+name = "alani-init"
+version = "0.1.0"
+edition = "2021"
+license-file = "LICENSE"
+publish = false
+
+[features]
+default = ["std"]
+std = []
+
+[dependencies]
+
+[package.metadata.alani]
+tier = "MVK required"
+owner = "Runtime team"
+architectural_dependencies = ["alani-runtime", "alani-config", "alani-policy", "alani-observability", "alani-audit"]
+aliases = ["alani-service-manager"]
